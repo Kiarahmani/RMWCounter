@@ -25,7 +25,7 @@ import Shoppr.Marshall
 import Data.Serialize
 import Control.Applicative ((<$>))
 import Control.Monad (forever)
-import Data.ByteString hiding (map, pack)
+import Data.ByteString hiding (map, pack, putStrLn)
 import Data.Either (rights)
 import Data.Map (Map)
 import Data.Time
@@ -57,7 +57,7 @@ mkDropTable :: TableName -> Query Schema () ()
 mkDropTable tname = query $ pack $ "drop table " ++ tname
 
 mkAddSessID :: TableName -> SessID -> Query Schema () ()
-mkAddSessID tname sid = query $ pack $ "alter table "++tname++" add "++(show sid)++" uuid"
+mkAddSessID tname sid = query $ pack $ "alter table "++tname++" add "++(show sid)++" int"
 
 mkDropSessID :: TableName -> SessID -> Query Schema () ()
 mkDropSessID tname sid = query $ pack $ "alter table "++tname++" drop "++(show sid)
@@ -90,10 +90,12 @@ cqlDelete tname k =
 
 createTable :: TableName -> Cas ()
 createTable tname = do
+  liftIO $ putStrLn $ "Creating "++(tname)
   liftIO . print =<< executeSchema ALL (mkCreateTable tname) ()
 
 dropTable :: TableName -> Cas ()
 dropTable tname = do
+  liftIO $ putStrLn $ "Dropping "++(tname)
   liftIO . print =<< executeSchema ALL (mkDropTable tname) ()
 
 addSessID :: TableName -> SessID -> Cas ()

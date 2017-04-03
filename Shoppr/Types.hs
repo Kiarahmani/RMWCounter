@@ -46,7 +46,7 @@ type SeqNo = Int64
 newtype SessID = SessID { unSessID :: UUID } deriving (Eq, Ord)
 
 instance Show SessID where
-  show (SessID uuid) = "SessID " ++ (show . sel1 . toWords $ uuid)
+  show (SessID uuid) = "SessID_" ++ (show . sel1 . toWords $ uuid)
 
 knownUUID :: UUID
 knownUUID = fromJust $ fromString $ "123e4567-e89b-12d3-a456-426655440000"
