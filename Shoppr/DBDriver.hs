@@ -13,6 +13,7 @@ module Shoppr.DBDriver (
 
   cqlRead,
   cqlInsert,
+  cqlInsertInSSN,
   cqlDelete,
 
 ) where
@@ -51,19 +52,22 @@ type ReadRow = (Int {- val -}, SeqNo {- sqn -})
 --------------------------------------------------------------------------------
 
 mkCreateTable :: TableName -> Query Schema () ()
-mkCreateTable tname = query $ pack $ "create table " ++ tname ++ " (objid blob, val bigint, primary key (objid))"
+mkCreateTable tname = query $ pack $ "create table " ++ tname ++ " (objid blob, val int, primary key (objid))"
 
 mkDropTable :: TableName -> Query Schema () ()
 mkDropTable tname = query $ pack $ "drop table " ++ tname
 
 mkAddSessID :: TableName -> SessID -> Query Schema () ()
-mkAddSessID tname sid = query $ pack $ "alter table "++tname++" add "++(show sid)++" int"
+mkAddSessID tname sid = query $ pack $ "alter table "++tname++" add "++(show sid)++" bigint"
 
 mkDropSessID :: TableName -> SessID -> Query Schema () ()
 mkDropSessID tname sid = query $ pack $ "alter table "++tname++" drop "++(show sid)
 
-mkInsert :: TableName -> SessID -> Query Write (Key, Int, SeqNo) ()
-mkInsert tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, val, "++(show sid)++") values (?, ?, ?)"
+mkInsert :: TableName ->  Query Write (Key, Int) ()
+mkInsert tname = query $ pack $ "insert into " ++ tname ++ " (objid, val) values (?, ?)"
+
+mkInsertInSSN :: TableName -> SessID -> Query Write (Key, Int, SeqNo) ()
+mkInsertInSSN tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, val, "++(show sid)++") values (?, ?, ?)"
 
 mkDelete :: TableName -> Query Write (Key) ()
 mkDelete tname = query $ pack $ "delete from " ++ tname ++ " where objid = ?"
@@ -77,12 +81,16 @@ cqlRead tname sid c k = do
   rows <- executeRows c (mkRead tname sid) k
   return rows
 
-cqlInsert :: TableName -> SessID -> Consistency -> Key -> ReadRow -> Cas ()
-cqlInsert tname sid c k (val,sqn) = do
+cqlInsert :: TableName -> Consistency -> Key -> Int -> Cas ()
+cqlInsert tname c k val = do
+    executeWrite c (mkInsert tname) (k,val)
+
+cqlInsertInSSN :: TableName -> SessID -> Consistency -> Key -> ReadRow -> Cas ()
+cqlInsertInSSN tname sid c k (val,sqn) = do
   if sqn == 0
-  then error "cqlInsert : sqn is 0"
+  then error "cqlInsertInSSN : sqn is 0"
   else do
-    executeWrite c (mkInsert tname sid) (k,val,sqn)
+    executeWrite c (mkInsertInSSN tname sid) (k,val,sqn)
 
 cqlDelete :: TableName -> Key -> Cas ()
 cqlDelete tname k =
@@ -100,10 +108,12 @@ dropTable tname = do
 
 addSessID :: TableName -> SessID -> Cas ()
 addSessID tname sid = do
+  liftIO $ putStrLn $ "Adding Session "++(show sid)
   liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
 
 dropSessID :: TableName -> SessID -> Cas ()
 dropSessID tname sid = do
+  liftIO $ putStrLn $ "Dropping Session "++(show sid)
   liftIO . print =<< executeSchema ONE (mkDropSessID tname sid) ()
 
 

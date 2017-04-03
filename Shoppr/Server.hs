@@ -68,7 +68,7 @@ worker pool = do
                     otherwise -> error "Many rows!!"
         return $ Response sqn ret
       Wr key val -> do
-        runCas pool (cqlInsert tname sid ONE key (val,sqn))
+        runCas pool (cqlInsertInSSN tname sid ONE key (val,sqn))
         return $ Response (sqn+1) Nothing
       AddSessID -> do
         runCas pool (addSessID tname sid)

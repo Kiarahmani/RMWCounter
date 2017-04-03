@@ -1,7 +1,11 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, ScopedTypeVariables #-}
+
 module Shoppr.Session (
 	CSN,
-  runSession
+  runSession,
+  read,
+  write,
+  newKey
 ) where
 
 import Prelude hiding (read)
@@ -17,6 +21,7 @@ import qualified System.ZMQ4 as ZMQ4
 import Control.Applicative ((<$>))
 import System.Random (randomIO)
 import Control.Concurrent (threadDelay)
+import Data.UUID
 
 import Shoppr.Types
 import Shoppr.NameService.Types
@@ -43,6 +48,7 @@ beginSession ns = do
   let req = encode $ Request cTABLE_NAME AddSessID sessid 0
   liftIO $ ZMQ4.send sock [] req
   responseBlob <- liftIO $ ZMQ4.receive sock
+  threadDelay 100000
   return $ Session (getFrontend ns) sock serverAddr sessid M.empty
 
 endSession :: Session -> IO ()
@@ -70,7 +76,9 @@ read key = do
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
   let Response _ (Just (val,seqNo')) = decodeResponse responseBlob
-  if seqNo' >= seqNo 
+  -- liftIO $ putStrLn $ "Is "++(show seqNo')++" >= "++(show seqNo)++"?"
+  -- liftIO $ putStrLn $ "read received val = "++(show val)
+  if seqNo' == seqNo - 1
   then return val
   else do
     liftIO $ threadDelay 100000
@@ -91,4 +99,9 @@ write key val = do
   let s' = Session (s^.broker) (s^.server) (s^.serverAddr) (s^.sessid) newSeqMap
   put s'
   return ()
-  
+ 
+newKey :: IO Key
+newKey = Key . encodeUUID <$> randomIO
+  where
+    encodeUUID (uuid :: UUID) = encode uuid
+

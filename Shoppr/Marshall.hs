@@ -51,6 +51,3 @@ decodeResponse :: ByteString -> Response
 decodeResponse b = case decode b of
                      Left s -> error $ "decodeResponse : " ++ s
                      Right v -> v
-
-
-
