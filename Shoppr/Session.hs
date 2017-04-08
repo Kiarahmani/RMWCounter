@@ -62,9 +62,13 @@ endSession s = do
 
 runSession :: Show a =>  NameService -> CSN a -> IO a
 runSession  ns comp = do
+  print "session begin"
   session <- beginSession  ns 
+  print "session perform"
   res <- evalStateT comp session
+  print "session end"
   endSession session
+  print "session end"
   return res
 
 readKey :: Key -> CSN Int
