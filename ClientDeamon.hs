@@ -62,7 +62,6 @@ main =
       replicateM_ threads $ forkIO $ do
           key <- liftIO $ newKey
 	  avgLatency <- runSession ns $ foldM (clientCore  key someTime) 0 [1 .. rounds]
-          print avgLatency
 	  putMVar mv avgLatency
       totalLat <- foldM (\l _ -> takeMVar mv >>= \newL -> return $ l + newL) 0 [1..threads]
       t2 <- getCurrentTime
@@ -98,7 +97,7 @@ clientCore  key someTime avgLat round = do
   let timeDiff = diffUTCTime t2 t1
   let newAvgLat = ((timeDiff / numOpsPerRound) + (avgLat * (fromIntegral $ round - 1))) / (fromIntegral round)
   -- Print info if required
-  liftIO . putStrLn $ "Round = " ++ show round ++ " result = " ++ "Rsult" ++ " latency = " ++ show newAvgLat
+  --liftIO . putStrLn $ "Round = " ++ show round ++ " result = " ++ "Rsult" ++ " latency = " ++ show newAvgLat
   return newAvgLat
 
 
