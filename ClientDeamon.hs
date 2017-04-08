@@ -66,9 +66,8 @@ main =
 	  putMVar mv avgLatency
       totalLat <- foldM (\l _ -> takeMVar mv >>= \newL -> return $ l + newL) 0 [1..threads]
       t2 <- getCurrentTime
-      return ()
-      --putStrLn $ "Throughput (ops/s) = " ++ (show $ (fromIntegral $ numOpsPerRound * rounds * threads) / (diffUTCTime t2 t1))
-      --putStrLn $ "Latency (s) = " ++ (show $ (totalLat / fromIntegral threads))
+      putStrLn $ "Throughput (ops/s) = " ++ (show $ (fromIntegral $ numOpsPerRound * rounds * threads) / (diffUTCTime t2 t1))
+      putStrLn $ "Latency (s) = " ++ (show $ (totalLat / fromIntegral threads))
 
 
 
@@ -95,9 +94,10 @@ clientCore  key someTime avgLat round = do
   t2 <- liftIO $ getCurrentTime
   let timeDiff = diffUTCTime t2 t1
   let newAvgLat = ((timeDiff / numOpsPerRound) + (avgLat * (fromIntegral $ round - 1))) / (fromIntegral round)
+  return ()
   -- Print info if required
-  liftIO . putStrLn $ "Round = " ++ show round ++ " result = " ++ "Rsult" ++ " latency = " ++ show newAvgLat
-  return newAvgLat
+  --liftIO . putStrLn $ "Round = " ++ show round ++ " result = " ++ "Rsult" ++ " latency = " ++ show newAvgLat
+  --return newAvgLat
 
 
 
