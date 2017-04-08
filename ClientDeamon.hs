@@ -76,7 +76,7 @@ clientCore :: Key-> UTCTime -> NominalDiffTime -> Int -> CSN NominalDiffTime
 clientCore  key someTime avgLat round = do
   -- Generate key
   t1 <- liftIO $ getCurrentTime
-  (initVal :: Int) <- liftIO $ randomRIO (1,1000) 
+  when (round == 1) $ do (initVal :: Int) <- liftIO $ randomRIO (1,1000) 
   write key initVal
   liftIO $ threadDelay 40000
   -- 1: Increment
