@@ -41,41 +41,12 @@ main =
   let be = Backend  $ "tcp://" ++ broker ++ ":" ++ (show bePort) in
 	let ns = mkNameService fe be "localhost" 5560 in
     do
-      putStrLn "Driver : Starting Broker"
-      b <- forkProcess $ startBroker (Frontend $ "tcp://*:" ++ show fePort)
-                     (Backend $ "tcp://*:" ++ show bePort)
-      threadDelay 1000000
-      putStrLn "Driver : Creating Table"
-      pool <- newPool ([head servers]) keyspace Nothing
-      runCas pool $ createTable cTABLE_NAME
       -- The object to which all sessions write to
-      key <- liftIO $ newKey
-      print "KEY:"
-      print key
       putStrLn "Driver : Starting servers"
-      s1 <- forkProcess $ runServer [("127.0.0.1","9042")] keyspace ns
-      s2 <- forkProcess $ runServer [("127.0.0.2","9042")] keyspace ns
-      s3 <- forkProcess $ runServer [("127.0.0.3","9042")] keyspace ns
-      threadDelay 1000000
-      putStrLn "Driver : Starting client"
-      res <- runSession ns $ do 
-        (initVal :: Int) <- liftIO $ randomRIO (1,1000) 
-        liftIO $ putStrLn $ "InitVal is "++(show initVal)
-        write key initVal
-        val <- read key
-        write key (val + 1)
-        val' <- read key
-        when (val' /= initVal + 1) $ do
-          liftIO $ putStrLn $ (show val')++" /= "++(show $ initVal + 1)++". RMW violated!"
-        return ()
-      -- Install handler for Ctrl-C
-      tid <- myThreadId
-      installHandler keyboardSignal (Catch $ reportSignal pool [b,s1,s2,s3] tid) Nothing
-      threadDelay (10000000)
-      -- Woken up..
-      mapM_ (signalProcess sigTERM) [b,s1,s2,s3]
-      putStrLn "Driver : Dropping Table"
-      runCas pool $ dropTable cTABLE_NAME
+      s1 <- forkIO $ runServer [("127.0.0.1","9042")] keyspace ns
+      s2 <- forkIO $ runServer [("127.0.0.2","9042")] keyspace ns
+      s3 <- forkIO $ runServer [("127.0.0.3","9042")] keyspace ns
+      threadDelay (1000000000)
       return ()
 
 

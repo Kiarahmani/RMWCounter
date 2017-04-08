@@ -59,6 +59,7 @@ worker pool = do
     let oper = req^.opReq
     let sid = req^.sidReq
     let sqn = req^.sqnReq
+    print "Operation.."
     result <- case oper of 
       Rd key -> do
         rows <- runCas pool (cqlRead tname sid ONE key)
