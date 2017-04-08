@@ -139,6 +139,9 @@ addSessID tname sid firstCall = do
 dropSessID :: TableName -> SessID -> Cas ()
 dropSessID tname sid = do
   liftIO $ putStrLn $ "Dropping Session "++(show sid)
+  wait <- liftIO $ randomRIO (1,20) 
+  liftIO $ threadDelay $ 1000000 + wait*100000
+  liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
   liftIO . print =<< executeSchema ONE (mkDropSessID tname sid) ()
 
 
