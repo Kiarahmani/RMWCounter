@@ -47,6 +47,8 @@ type TableName = String
 
 type ReadRow = (Int {- val -}, SeqNo {- sqn -})
 
+
+
 --------------------------------------------------------------------------------
 -- Cassandra Link Layer
 --------------------------------------------------------------------------------
@@ -67,13 +69,19 @@ mkInsert :: TableName ->  Query Write (Key, Int) ()
 mkInsert tname = query $ pack $ "insert into " ++ tname ++ " (objid, val) values (?, ?)"
 
 mkInsertInSSN :: TableName -> SessID -> Query Write (Key, Int, SeqNo) ()
-mkInsertInSSN tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, val, "++(show sid)++") values (?, ?, ?)"
+mkInsertInSSN tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, val, "++(show sid)++") values (?, ?, ?) "
+
+
+mkInsertToken :: TableName -> SessID -> Query Write (Key, Int, SeqNo) ()
+mkInsertToken tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, val, "++(show sid)++") values (?, ?, ?) if not exists" 
 
 mkDelete :: TableName -> Query Write (Key) ()
 mkDelete tname = query $ pack $ "delete from " ++ tname ++ " where objid = ?"
 
 mkRead :: TableName -> SessID -> Query Rows (Key) ReadRow
 mkRead tname sid = query $ pack $ "select val, "++(show sid)++" from " ++ tname ++ " where objid = ?"
+
+
 
 -------------------------------------------------------------------------------
 cqlRead :: TableName -> SessID -> Consistency -> Key -> Cas [ReadRow]
@@ -106,10 +114,24 @@ dropTable tname = do
   liftIO $ putStrLn $ "Dropping "++(tname)
   liftIO . print =<< executeSchema ALL (mkDropTable tname) ()
 
-addSessID :: TableName -> SessID -> Cas ()
-addSessID tname sid = do
-  liftIO $ putStrLn $ "Adding Session "++(show sid)
-  liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
+
+
+addSessID :: TableName -> SessID -> Bool -> Cas ()
+addSessID tname sid firstCall = do
+  when (firstCall) $ do 
+  	liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
+  let k = Key $  encode (0 :: Integer)
+  let val = 0 
+  let sqn = 0
+  res <-  executeTrans  (mkInsertToken tname sid) (k,val,sqn) ALL
+  if res 
+  then return ()
+  else do
+        liftIO $ print "fuck"
+  	liftIO $ threadDelay 1000
+	addSessID tname sid False
+
+
 
 dropSessID :: TableName -> SessID -> Cas ()
 dropSessID tname sid = do
@@ -118,4 +140,10 @@ dropSessID tname sid = do
 
 
 ----------------------------------------------------------------------------------
+
+
+
+
+
+
 

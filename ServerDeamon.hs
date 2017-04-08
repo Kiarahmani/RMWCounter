@@ -43,9 +43,9 @@ main =
     do
       -- The object to which all sessions write to
       putStrLn "Driver : Starting servers"
-      s1 <- forkIO $ runServer [("127.0.0.1","9042")] keyspace ns
-      s2 <- forkIO $ runServer [("127.0.0.2","9042")] keyspace ns
-      s3 <- forkIO $ runServer [("127.0.0.3","9042")] keyspace ns
+      s1 <- forkIO $ runServer [("localhost","9042")] keyspace ns
+      --s2 <- forkIO $ runServer [("127.0.0.2","9042")] keyspace ns
+      --s3 <- forkIO $ runServer [("127.0.0.3","9042")] keyspace ns
       threadDelay (1000000000)
       return ()
 

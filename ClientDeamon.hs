@@ -58,10 +58,10 @@ main =
       someTime <- getCurrentTime
       mv::(MVar NominalDiffTime)<- newEmptyMVar
       t1 <- getCurrentTime
-      key <- liftIO $ newKey
       putStrLn "Driver : Starting client"
       replicateM_ threads $ forkIO $ do
-          avgLatency <- runSession ns $ foldM (clientCore  key someTime) 0 [1 .. rounds]
+          key <- liftIO $ newKey
+	  avgLatency <- runSession ns $ foldM (clientCore  key someTime) 0 [1 .. rounds]
           putMVar mv avgLatency
       totalLat <- foldM (\l _ -> takeMVar mv >>= \newL -> return $ l + newL) 0 [1..threads]
       t2 <- getCurrentTime  
@@ -75,9 +75,8 @@ clientCore :: Key-> UTCTime -> NominalDiffTime -> Int -> CSN NominalDiffTime
 clientCore  key someTime avgLat round = do
   -- Generate key
   t1 <- liftIO $ getCurrentTime
-  when (round == 1) $ do
-  	(initVal :: Int) <- liftIO $ randomRIO (1,1000) 
-  	write key initVal
+  (initVal :: Int) <- liftIO $ randomRIO (1,1000) 
+  write key initVal
   -- 1: Increment
   val <- readKey key
   write key (val + 1)

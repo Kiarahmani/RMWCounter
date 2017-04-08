@@ -22,6 +22,7 @@ import Control.Applicative ((<$>))
 import System.Random (randomIO)
 import Control.Concurrent (threadDelay)
 import Data.UUID
+import Control.Concurrent.MVar
 
 import Shoppr.Types
 import Shoppr.NameService.Types
@@ -48,19 +49,20 @@ beginSession ns = do
   let req = encode $ Request cTABLE_NAME AddSessID sessid 0
   liftIO $ ZMQ4.send sock [] req
   responseBlob <- liftIO $ ZMQ4.receive sock
-  threadDelay 100000
+  threadDelay 1000
   return $ Session (getFrontend ns) sock serverAddr sessid M.empty
 
 endSession :: Session -> IO ()
 endSession s = do
+  threadDelay 1000000 
   let req = encode $ Request cTABLE_NAME DropSessID (s^.sessid) 0
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
   ZMQ4.disconnect (s ^. server) (s^.serverAddr)
 
-runSession :: Show a => NameService -> CSN a -> IO a
-runSession ns comp = do
-  session <- beginSession ns
+runSession :: Show a =>  NameService -> CSN a -> IO a
+runSession  ns comp = do
+  session <- beginSession  ns 
   res <- evalStateT comp session
   endSession session
   return res
