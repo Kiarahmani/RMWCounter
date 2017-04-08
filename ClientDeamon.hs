@@ -63,10 +63,9 @@ main =
           key <- liftIO $ newKey
 	  avgLatency <- runSession ns $ foldM (clientCore  key someTime) 0 [1 .. rounds]
           print avgLatency
-	  --putMVar mv avgLatency
-     -- totalLat <- foldM (\l _ -> takeMVar mv >>= \newL -> return $ l + newL) 0 [1..threads]
+	  putMVar mv avgLatency
+      totalLat <- foldM (\l _ -> takeMVar mv >>= \newL -> return $ l + newL) 0 [1..threads]
       t2 <- getCurrentTime
-      print t2
       --putStrLn $ "Throughput (ops/s) = " ++ (show $ (fromIntegral $ numOpsPerRound * rounds * threads) / (diffUTCTime t2 t1))
       --putStrLn $ "Latency (s) = " ++ (show $ (totalLat / fromIntegral threads))
 
