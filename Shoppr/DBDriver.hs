@@ -41,8 +41,8 @@ import Data.Text hiding (map)
 import Control.Monad.Trans (liftIO)
 import Data.Maybe (fromJust)
 import Control.Monad (when)
-
--- Simply an alias for Types.ObjType
+import System.Random (randomRIO)
+-- Simplay an alias for Types.ObjType
 type TableName = String
 
 type ReadRow = (Int {- val -}, SeqNo {- sqn -})
@@ -119,6 +119,9 @@ dropTable tname = do
 addSessID :: TableName -> SessID -> Bool -> Cas ()
 addSessID tname sid firstCall = do
  -- when (firstCall) $ do 
+ --     
+ 	wait <- liftIO $ randomRIO (1,20) 
+ 	liftIO $ threadDelay $ 1000000 + wait*100000
   	liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
  -- let k = Key $  encode (0 :: Integer)
  -- let val = 0 
