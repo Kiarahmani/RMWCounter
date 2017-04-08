@@ -23,7 +23,7 @@ import System.Random (randomIO)
 import Control.Concurrent (threadDelay)
 import Data.UUID
 import Control.Concurrent.MVar
-
+import System.Random (randomRIO)
 import Shoppr.Types
 import Shoppr.NameService.Types
 import Shoppr.Consts (cTABLE_NAME)
@@ -54,7 +54,8 @@ beginSession ns = do
 
 endSession :: Session -> IO ()
 endSession s = do
-  threadDelay 16000000 
+  wait  <- liftIO $ randomRIO (1,100000)
+  threadDelay $ 6000000 + wait
   let req = encode $ Request cTABLE_NAME DropSessID (s^.sessid) 0
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
