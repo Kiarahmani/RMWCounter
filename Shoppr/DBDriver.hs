@@ -121,7 +121,7 @@ addSessID tname sid firstCall = do
  -- when (firstCall) $ do 
  --     
  	wait <- liftIO $ randomRIO (1,20) 
- 	liftIO $ threadDelay $ 1000000 + wait*100000
+ 	liftIO $ threadDelay $ 1000000 + wait*300000
   	liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
  -- let k = Key $  encode (0 :: Integer)
  -- let val = 0 

@@ -77,17 +77,17 @@ clientCore  key someTime avgLat round = do
   t1 <- liftIO $ getCurrentTime
   when (round == 1) $ do (initVal :: Int) <- liftIO $ randomRIO (1,1000) 
   			 write key initVal
-  liftIO $ threadDelay 40000
+  liftIO $ threadDelay 4000
   -- 1: Increment
   val <- readKey key
   write key (val + 1)
 
-  liftIO $ threadDelay 40000
+  liftIO $ threadDelay 4000
   -- 2: Decrement
   val <- readKey key
   write key (val - 1)
   
-  liftIO $ threadDelay 40000
+  liftIO $ threadDelay 4000
   -- 3: Increment
   val <- readKey key
   write key (val + 1)
