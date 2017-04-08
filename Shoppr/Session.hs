@@ -73,7 +73,7 @@ readKey key = do
   let seqNo = case M.lookup key $ s^.seqMap of 
                 Nothing -> 1
                 Just s -> s
-  let req = encode $ Request cTABLE_NAME (Rd key) (s^.sessid) seqNo
+  {-let req = encode $ Request cTABLE_NAME (Rd key) (s^.sessid) seqNo
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
   let Response _ (Just (val,seqNo')) = decodeResponse responseBlob
@@ -85,7 +85,9 @@ readKey key = do
     liftIO $ threadDelay 100000
     liftIO $ putStrLn "Retrying read..."
     readKey key
-
+  
+  -}
+  return 8
 write :: Key -> Int -> CSN ()
 write key val = do
   s <- get
