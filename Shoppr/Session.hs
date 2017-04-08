@@ -69,10 +69,10 @@ runSession  ns comp = do
 
 readKey :: Key -> CSN Int
 readKey key = do
-  s <- get
-  let seqNo = case M.lookup key $ s^.seqMap of 
-                Nothing -> 1
-                Just s -> s
+  --s <- get
+  --let seqNo = case M.lookup key $ s^.seqMap of 
+   --             Nothing -> 1
+   --             Just s -> s
   {-let req = encode $ Request cTABLE_NAME (Rd key) (s^.sessid) seqNo
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
@@ -90,17 +90,17 @@ readKey key = do
   return 8
 write :: Key -> Int -> CSN ()
 write key val = do
-  s <- get
-  let seqNo = case M.lookup key $ s^.seqMap of 
-                Nothing -> 1
-                Just s -> s
-  let req = encode $ Request cTABLE_NAME (Wr key val) (s^.sessid) seqNo
+  --s <- get
+  --let seqNo = case M.lookup key $ s^.seqMap of 
+   --             Nothing -> 1
+    --            Just s -> s
+  {-let req = encode $ Request cTABLE_NAME (Wr key val) (s^.sessid) seqNo
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
   let Response seqNo' _ = decodeResponse responseBlob
   let newSeqMap = M.insert key seqNo' $ s^.seqMap
   let s' = Session (s^.broker) (s^.server) (s^.serverAddr) (s^.sessid) newSeqMap
-  put s'
+  put s'-}
   return ()
  
 newKey :: IO Key
