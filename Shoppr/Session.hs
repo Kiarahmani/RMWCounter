@@ -54,7 +54,7 @@ beginSession ns = do
 
 endSession :: Session -> IO ()
 endSession s = do
-  wait  <- liftIO $ randomRIO (1,100)
+  --wait  <- liftIO $ randomRIO (1,100)
   --threadDelay $ 6000000 + wait*100000
   --let req = encode $ Request cTABLE_NAME DropSessID (s^.sessid) 0
   --liftIO $ ZMQ4.send (s^.server) [] req
