@@ -68,7 +68,7 @@ runSession  ns comp = do
   res <- evalStateT comp session
   print "session end"
   endSession session
-  print "session end"
+  print "session return"
   return res
 
 readKey :: Key -> CSN Int
