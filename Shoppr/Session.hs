@@ -54,10 +54,10 @@ beginSession ns = do
 
 endSession :: Session -> IO ()
 endSession s = do
-  threadDelay $ 5000000
-  let req = encode $ Request cTABLE_NAME DropSessID (s^.sessid) 0
-  liftIO $ ZMQ4.send (s^.server) [] req
-  responseBlob <- liftIO $ ZMQ4.receive (s^.server)
+  threadDelay $ 500000
+  --let req = encode $ Request cTABLE_NAME DropSessID (s^.sessid) 0
+  --liftIO $ ZMQ4.send (s^.server) [] req
+  --responseBlob <- liftIO $ ZMQ4.receive (s^.server)
   ZMQ4.disconnect (s ^. server) (s^.serverAddr)
 
 runSession :: Show a =>  NameService -> CSN a -> IO a
