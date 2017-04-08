@@ -46,9 +46,9 @@ beginSession :: NameService -> IO Session
 beginSession ns = do
   (serverAddr, sock) <- getClientJoin ns
   sessid <- SessID <$> randomIO
-  let req = encode $ Request cTABLE_NAME AddSessID sessid 0
-  liftIO $ ZMQ4.send sock [] req
-  responseBlob <- liftIO $ ZMQ4.receive sock
+  --let req = encode $ Request cTABLE_NAME AddSessID sessid 0
+  --liftIO $ ZMQ4.send sock [] req
+  --responseBlob <- liftIO $ ZMQ4.receive sock
   threadDelay 6000000
   return $ Session (getFrontend ns) sock serverAddr sessid M.empty
 
