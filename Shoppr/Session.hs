@@ -62,36 +62,30 @@ endSession s = do
 
 runSession :: Show a =>  NameService -> CSN a -> IO a
 runSession  ns comp = do
-  print "session begin"
   session <- beginSession  ns 
-  print "session perform"
   res <- evalStateT comp session
-  print "session end"
   endSession session
-  print "session return"
   return res
 
 readKey :: Key -> CSN Int
 readKey key = do
-  --s <- get
-  --let seqNo = case M.lookup key $ s^.seqMap of 
-   --             Nothing -> 1
-   --             Just s -> s
-  {-let req = encode $ Request cTABLE_NAME (Rd key) (s^.sessid) seqNo
+  s <- get
+  let seqNo = case M.lookup key $ s^.seqMap of 
+                Nothing -> 1
+                Just s -> s
+  let req = encode $ Request cTABLE_NAME (Rd key) (s^.sessid) seqNo
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
   let Response _ (Just (val,seqNo')) = decodeResponse responseBlob
   -- liftIO $ putStrLn $ "Is "++(show seqNo')++" >= "++(show seqNo)++"?"
   -- liftIO $ putStrLn $ "read received val = "++(show val)
-  if seqNo' == seqNo - 1
+  if True --seqNo' == seqNo - 1
   then return val
   else do
     liftIO $ threadDelay 100000
     liftIO $ putStrLn "Retrying read..."
     readKey key
   
-  -}
-  return 8
 write :: Key -> Int -> CSN ()
 write key val = do
   s <- get
