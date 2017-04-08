@@ -49,13 +49,13 @@ beginSession ns = do
   --let req = encode $ Request cTABLE_NAME AddSessID sessid 0
   --liftIO $ ZMQ4.send sock [] req
   --responseBlob <- liftIO $ ZMQ4.receive sock
-  threadDelay 6000000
+  --threadDelay 6000000
   return $ Session (getFrontend ns) sock serverAddr sessid M.empty
 
 endSession :: Session -> IO ()
 endSession s = do
   wait  <- liftIO $ randomRIO (1,100)
-  threadDelay $ 6000000 + wait*100000
+  --threadDelay $ 6000000 + wait*100000
   --let req = encode $ Request cTABLE_NAME DropSessID (s^.sessid) 0
   --liftIO $ ZMQ4.send (s^.server) [] req
   --responseBlob <- liftIO $ ZMQ4.receive (s^.server)
