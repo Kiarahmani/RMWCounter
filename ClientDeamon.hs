@@ -97,10 +97,9 @@ clientCore  key someTime avgLat round = do
   t2 <- liftIO $ getCurrentTime
   let timeDiff = diffUTCTime t2 t1
   let newAvgLat = ((timeDiff / numOpsPerRound) + (avgLat * (fromIntegral $ round - 1))) / (fromIntegral round)
-  return ()
   -- Print info if required
-  --liftIO . putStrLn $ "Round = " ++ show round ++ " result = " ++ "Rsult" ++ " latency = " ++ show newAvgLat
-  --return newAvgLat
+  liftIO . putStrLn $ "Round = " ++ show round ++ " result = " ++ "Rsult" ++ " latency = " ++ show newAvgLat
+  return newAvgLat
 
 
 
