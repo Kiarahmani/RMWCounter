@@ -62,7 +62,8 @@ main =
       replicateM_ threads $ forkIO $ do
           key <- liftIO $ newKey
 	  avgLatency <- runSession ns $ foldM (clientCore  key someTime) 0 [1 .. rounds]
-          --putMVar mv avgLatency
+          print avgLatency
+	  --putMVar mv avgLatency
      -- totalLat <- foldM (\l _ -> takeMVar mv >>= \newL -> return $ l + newL) 0 [1..threads]
       t2 <- getCurrentTime  
       --putStrLn $ "Throughput (ops/s) = " ++ (show $ (fromIntegral $ numOpsPerRound * rounds * threads) / (diffUTCTime t2 t1))
