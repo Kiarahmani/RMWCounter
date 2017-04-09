@@ -78,15 +78,15 @@ mkInsertToken tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, va
 mkDelete :: TableName -> Query Write (Key) ()
 mkDelete tname = query $ pack $ "delete from " ++ tname ++ " where objid = ?"
 
-mkRead :: TableName -> SessID -> Query Rows (Key) ReadRow
-mkRead tname sid = query $ pack $ "select val, "++(show sid)++" from " ++ tname ++ " where objid = ?"
+mkRead :: TableName -> Query Rows (Key) ReadRow
+mkRead tname = query $ pack $ "select val from " ++ tname ++ " where objid = ?"
 
 
 
 -------------------------------------------------------------------------------
 cqlRead :: TableName -> SessID -> Consistency -> Key -> Cas [ReadRow]
 cqlRead tname sid c k = do
-  rows <- executeRows c (mkRead tname sid) k
+  rows <- executeRows c (mkRead tname) k
   return rows
 
 cqlInsert :: TableName -> Consistency -> Key -> Int -> Cas ()
