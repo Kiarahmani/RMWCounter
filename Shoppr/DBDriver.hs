@@ -13,7 +13,7 @@ module Shoppr.DBDriver (
 
   cqlRead,
   cqlInsert,
-  cqlInsertInSSN,
+  --cqlInsertInSSN,
   cqlDelete,
 
 ) where
@@ -45,7 +45,7 @@ import System.Random (randomRIO)
 -- Simplay an alias for Types.ObjType
 type TableName = String
 
-type ReadRow = (Int {- val -}, SeqNo {- sqn -})
+type ReadRow = (Int {- val -})
 
 
 
@@ -93,13 +93,13 @@ cqlInsert :: TableName -> Consistency -> Key -> Int -> Cas ()
 cqlInsert tname c k val = do
     executeWrite c (mkInsert tname) (k,val)
 
-cqlInsertInSSN :: TableName -> SessID -> Consistency -> Key -> ReadRow -> Cas ()
+{-cqlInsertInSSN :: TableName -> SessID -> Consistency -> Key -> ReadRow -> Cas ()
 cqlInsertInSSN tname sid c k (val,sqn) = do
   if sqn == 0
   then error "cqlInsertInSSN : sqn is 0"
   else do
     executeWrite c (mkInsertInSSN tname sid) (k,val,sqn)
-
+-}
 cqlDelete :: TableName -> Key -> Cas ()
 cqlDelete tname k =
   executeWrite ONE (mkDelete tname) (k)

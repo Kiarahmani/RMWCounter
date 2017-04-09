@@ -65,7 +65,6 @@ data Request = Request {
 }
 
 data Response = Response {
-  seqno :: SeqNo,
-  result :: Maybe (Int,SeqNo)
+  result :: Maybe (Int)
 }
 

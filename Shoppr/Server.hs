@@ -67,15 +67,15 @@ worker pool = do
                     [] -> Nothing
                     [row] -> Just row
                     otherwise -> error "Many rows!!"
-        return $ Response sqn ret
+        return $ Response ret
       Wr key val -> do
         runCas pool (cqlInsert tname ONE key val)
-        return $ Response (sqn+1) Nothing
+        return $ Response  Nothing
       AddSessID -> do
         runCas pool (addSessID tname sid True)
-        return $ Response sqn Nothing
+        return $ Response  Nothing
       DropSessID -> do
         runCas pool (dropSessID tname sid)
-        return $ Response sqn Nothing
+        return $ Response  Nothing
     ZMQ4.send sock [] $ encode result
 

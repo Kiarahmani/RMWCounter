@@ -76,7 +76,7 @@ readKey key = do
   let req = encode $ Request cTABLE_NAME (Rd key) (s^.sessid) seqNo
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
-  let Response _ (Just (val,seqNo')) = decodeResponse responseBlob
+  let Response (Just val) = decodeResponse responseBlob
   -- liftIO $ putStrLn $ "Is "++(show seqNo')++" >= "++(show seqNo)++"?"
   -- liftIO $ putStrLn $ "read received val = "++(show val)
   if True --seqNo' == seqNo - 1
@@ -95,10 +95,10 @@ write key val = do
   let req = encode $ Request cTABLE_NAME (Wr key val) (s^.sessid) seqNo
   liftIO $ ZMQ4.send (s^.server) [] req
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
-  let Response seqNo' _ = decodeResponse responseBlob
-  let newSeqMap = M.insert key seqNo' $ s^.seqMap
-  let s' = Session (s^.broker) (s^.server) (s^.serverAddr) (s^.sessid) newSeqMap
-  put s'
+  --let Response seqNo' _ = decodeResponse responseBlob
+  --let newSeqMap = M.insert key seqNo' $ s^.seqMap
+  --let s' = Session (s^.broker) (s^.server) (s^.serverAddr) (s^.sessid) newSeqMap
+  --put s'
   return ()
  
 newKey :: IO Key
