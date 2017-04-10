@@ -75,10 +75,10 @@ clientCore :: Key-> UTCTime -> NominalDiffTime -> Int -> CSN NominalDiffTime
 clientCore  key someTime avgLat round = do
   -- Generate key
   t1 <- liftIO $ getCurrentTime
-  when (round<=1) do
-  		(initVal :: Int) <- liftIO $ randomRIO (1,1000) 
-  		write key initVal
-  -- 1: Increment
+  --when (round<=1) do
+  (initVal :: Int) <- liftIO $ randomRIO (1,1000) 
+  write key initVal
+  {-- 1: Increment
   val <- readKey key
   write key (val + 1)
   
@@ -90,7 +90,7 @@ clientCore  key someTime avgLat round = do
   val <- readKey key
   write key (val + 1)
 
-
+-}
   t2 <- liftIO $ getCurrentTime
   let timeDiff = diffUTCTime t2 t1
   let newAvgLat = ((timeDiff / numOpsPerRound) + (avgLat * (fromIntegral $ round - 1))) / (fromIntegral round)
