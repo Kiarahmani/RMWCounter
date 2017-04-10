@@ -120,16 +120,6 @@ addSessID :: TableName -> SessID -> Bool -> Cas ()
 addSessID tname sid firstCall = do
   when (firstCall) $ do 
   	liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
-  let k = Key $  encode (0 :: Integer)
-  let val = 0 
-  let sqn = 0
-  res <-  executeTrans  (mkInsertToken tname sid) (k,val,sqn) ALL
-  if res 
-  then return ()
-  else do
-        liftIO $ print "fuck"
-  	liftIO $ threadDelay 1000
-	addSessID tname sid False
 
 
 
