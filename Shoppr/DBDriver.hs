@@ -116,10 +116,9 @@ dropTable tname = do
 
 
 
-addSessID :: TableName -> SessID -> Bool -> Cas ()
-addSessID tname sid firstCall = do
-  when (firstCall) $ do 
-  	liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
+addSessID :: TableName -> SessID  -> Cas ()
+addSessID tname sid  = do
+  liftIO . print =<< executeSchema ONE (mkAddSessID tname sid) ()
 
 
 
