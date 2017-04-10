@@ -11,6 +11,8 @@ import System.Posix.Signals
 import System.Posix.Types (ProcessID)
 import System.Posix.Process
 import System.Random (randomRIO)
+import System.Environment
+import qualified Data.List as L
 
 import Shoppr.NameService.LoadBalancingBroker
 import Shoppr.NameService.Types
@@ -36,11 +38,14 @@ servers = [("127.0.0.1","9042"),
            ("127.0.0.3","9042")]
 
 main :: IO ()
-main =
-  let fe = Frontend $ "tcp://" ++ broker ++ ":" ++ (show fePort) in
-  let be = Backend  $ "tcp://" ++ broker ++ ":" ++ (show bePort) in
-	let ns = mkNameService fe be "localhost" 5560 in
-    do
+main = do
+      args <- getArgs  
+      let broker = L.head args
+      let fe = Frontend $ "tcp://" ++ broker ++ ":" ++ (show fePort) 
+      let be = Backend  $ "tcp://" ++ broker ++ ":" ++ (show bePort) 
+      let ns = mkNameService fe be "localhost" 5560 
+ 
+      
       -- The object to which all sessions write to
       putStrLn "Driver : Starting servers"
       s1 <- forkIO $ runServer [("localhost","9042")] keyspace ns
