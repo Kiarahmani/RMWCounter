@@ -166,6 +166,7 @@ tryGetLock tname = do
     return True
   else do 
     liftIO $ threadDelay  cLOCK_DELAY 	
+    liftIO $ print "Trying to get the lock.."
     tryGetLock tname
 
 
