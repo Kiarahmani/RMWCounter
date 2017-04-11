@@ -95,8 +95,8 @@ mkDropLockTable tname = query $ pack $ "drop table " ++ tname ++ "_LOCK"
 mkLockUpdate :: TableName -> Query Write (Int, Bool) ()
 mkLockUpdate tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?)"
 
-
-
+mkLockRead :: TableName -> Query Rows (Int) Bool
+mkLockRead tname = query $ pack $ "select free, from" ++ tname ++ "_LOCK where lock = ?"
 -------------------------------------------------------------------------------
 cqlRead :: TableName -> SessID -> Consistency -> Key -> Cas [ReadRow]
 cqlRead tname sid c k = do
@@ -145,36 +145,33 @@ dropSessID tname sid = do
 ----------------------------------------------------------------------------------
 
 
-initLock :: TableName -> Cas Bool 
+initLock :: TableName -> Cas ()
 initLock tname = do 
   liftIO . print =<< executeSchema ALL (mkCreateLockTable tname) ()
-  res <- executeWrite ALL (mkLockUpdate tname) (0,True) 
-  if True --res
-  then return True
-  else error $ "initialization falied"
-
+  executeWrite ALL (mkLockUpdate tname) (0,True) 
+  return ()
 
 dropLockTable :: TableName -> Cas () 
 dropLockTable tname = do 
   liftIO . print =<< executeSchema ALL (mkDropLockTable tname) ()
 
 
-tryGetLock :: TableName -> Cas Bool 
+tryGetLock :: TableName -> Cas Bool
 tryGetLock tname = do 
-  res <- executeWrite ALL (mkLockUpdate tname) (0,True)
+  [res] <- executeRows ALL (mkLockRead tname) 0
   if res 
-  then return True
-  else do
-      liftIO $ threadDelay cLOCK_DELAY
-      tryGetLock tname 
+  then do 
+    executeWrite ALL (mkLockUpdate tname) (0,False)
+    return True
+  else do 
+    liftIO $ threadDelay  cLOCK_DELAY 	
+    tryGetLock tname
 
 
 getLock :: TableName -> Cas ()
 getLock tname = do 
   tryGetLock tname 
   return ()
-
-
 
 
 releaseLock :: TableName -> Cas ()
