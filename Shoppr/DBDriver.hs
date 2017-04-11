@@ -161,7 +161,7 @@ tryGetLock :: TableName -> Cas Bool
 tryGetLock tname = do 
   [res] <- executeRows ALL (mkLockRead tname) 0
   return True 
-  if False --res 
+  if res 
   then do 
     executeWrite ALL (mkLockUpdate tname) (0,False)
     return True
