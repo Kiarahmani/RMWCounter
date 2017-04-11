@@ -178,7 +178,7 @@ getLock tname = do
 
 releaseLock :: TableName -> Cas ()
 releaseLock tname = do 
-  res <- executeTrans (mkLockUpdate tname) (0,True) ALL
+  res <- executeWrite ALL (mkLockUpdate tname) (0,True) 
   return ()
 
 
