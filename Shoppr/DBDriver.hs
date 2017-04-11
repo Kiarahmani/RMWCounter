@@ -167,7 +167,7 @@ tryGetLock tname = do
   then return True
   else do 
      liftIO $ print "Waiting for lock..."
-     liftIO $ threadDelay  $ cLOCK_DELAY
+     liftIO $ threadDelay  $ cLOCK_DELAY * 10
      tryGetLock tname
 
 
