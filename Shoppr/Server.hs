@@ -72,7 +72,7 @@ worker pool = do
         runCas pool (cqlInsertInSSN tname sid ONE key (val,sqn))
         return $ Response (sqn+1) Nothing
       AddSessID -> do
-        --runCas pool (getLock tname)
+        runCas pool (getLock tname)
 	runCas pool (addSessID tname sid)
 	--runCas pool (releaseLock tname)
         return $ Response sqn Nothing
