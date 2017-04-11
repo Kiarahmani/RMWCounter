@@ -74,7 +74,7 @@ worker pool = do
       AddSessID -> do
         runCas pool (getLock tname)
 	runCas pool (addSessID tname sid)
-	runCas pool (releaseLock tname)
+	--runCas pool (releaseLock tname)
         return $ Response sqn Nothing
       DropSessID -> do
         runCas pool (dropSessID tname sid)
