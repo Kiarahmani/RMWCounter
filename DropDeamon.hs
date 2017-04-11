@@ -40,7 +40,7 @@ main = do
       	putStrLn "Driver : Dropping Table"
       	pool <- newPool ([head servers]) keyspace Nothing
 	runCas pool $ dropTable cTABLE_NAME
-	runCas pool $ deopLockTable cTABLE_NAME 
+	runCas pool $ dropLockTable cTABLE_NAME 
       	return ()
 
 
