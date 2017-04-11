@@ -162,7 +162,7 @@ tryGetLock tname = do
   [res] <- executeRows ALL (mkLockRead tname) 0
   if res 
   then do 
-    executeWrite ALL (mkLockUpdate tname) (0,False)
+    executeTrans (mkLockUpdate tname) (0,False) ALL
     return True
   else do 
     liftIO $ threadDelay  $ cLOCK_DELAY+10000 	
@@ -178,7 +178,7 @@ getLock tname = do
 
 releaseLock :: TableName -> Cas ()
 releaseLock tname = do 
-  res <- executeWrite ALL (mkLockUpdate tname) (0,True) 
+  res <- executeTrans  (mkLockUpdate tname) (0,True) ALL
   return ()
 
 
