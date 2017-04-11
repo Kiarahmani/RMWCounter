@@ -45,7 +45,7 @@ main =
 	let ns = mkNameService fe be "localhost" 5560 in
     do
       putStrLn "Driver : Creating Table"
-      pool <- newPool (servers) keyspace Nothing
+      pool <- newPool ([("localhost","9042")]) keyspace Nothing
       runCas pool $ createTable cTABLE_NAME
       runCas pool $ initLock cTABLE_NAME 
       return ()

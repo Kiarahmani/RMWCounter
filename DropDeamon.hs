@@ -39,7 +39,7 @@ servers = [("54.200.213.248","9042"),
 main :: IO ()
 main = do
       	putStrLn "Driver : Dropping Table"
-      	pool <- newPool ([]) keyspace Nothing
+      	pool <- newPool ([("localhost","9042")]) keyspace Nothing
 	runCas pool $ dropTable cTABLE_NAME
 	runCas pool $ dropLockTable cTABLE_NAME 
       	return ()
