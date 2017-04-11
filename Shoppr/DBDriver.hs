@@ -18,7 +18,8 @@ module Shoppr.DBDriver (
   
   initLock,
   getLock,
-  releaseLock
+  releaseLock,
+  dropLockTable
 ) where
 
 
