@@ -31,9 +31,10 @@ keyspace :: Keyspace
 keyspace = Keyspace $ pack "shoppr"
 
 servers :: [Cassandra.Server]
-servers = [("127.0.0.1","9042"),
-           ("127.0.0.2","9042"),
-           ("127.0.0.3","9042")]
+servers = [("54.200.213.248","9042"),
+           ("54.214.178.61","9042"),
+           ("54.202.28.79","9042")]
+
 
 main :: IO ()
 main = do
