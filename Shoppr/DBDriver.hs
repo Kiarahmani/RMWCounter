@@ -161,7 +161,7 @@ dropLockTable tname = do
 
 tryGetLock :: TableName -> Cas Bool 
 tryGetLock tname = do 
-  res <- executeTrans (mkLockUpdate tname) (0,False) ONEs
+  res <- executeTrans (mkLockUpdate tname) (0,False) ONE
   if res 
   then return True
   else do
