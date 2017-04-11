@@ -148,7 +148,7 @@ dropSessID tname sid = do
 initLock :: TableName -> Cas Bool 
 initLock tname = do 
   liftIO . print =<< executeSchema ALL (mkCreateLockTable tname) ()
-  res <- executeWrite ALL (mkLockUpdate tname) (0,True) 
+  res <- executeTrans (mkLockUpdate tname) (0,True) ALL 
   if True --res
   then return True
   else error $ "initialization falied"
@@ -159,9 +159,14 @@ dropLockTable tname = do
   liftIO . print =<< executeSchema ALL (mkDropLockTable tname) ()
 
 
-tryGetLock :: TableName -> Cas ()
+tryGetLock :: TableName -> Cas Bool 
 tryGetLock tname = do 
-  executeWrite ALL (mkLockUpdate tname) (0,False)
+  res <- executeTrans (mkLockUpdate tname) (0,True) ALL
+  if res 
+  then return True
+  else do
+      liftIO $ threadDelay cLOCK_DELAY
+      tryGetLock tname 
 
 
 getLock :: TableName -> Cas ()
@@ -174,7 +179,7 @@ getLock tname = do
 
 releaseLock :: TableName -> Cas ()
 releaseLock tname = do 
-  res <- executeWrite ALL (mkLockUpdate tname) (0,True)
+  res <- executeTrans (mkLockUpdate tname) (0,True) ALL
   return ()
 
 
