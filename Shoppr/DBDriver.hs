@@ -161,7 +161,7 @@ dropLockTable tname = do
 
 tryGetLock :: TableName -> Cas Bool 
 tryGetLock tname = do 
-  res <- executeTrans (mkLockUpdate tname) (0,False) SERIAL
+  res <- executeTrans (mkLockUpdate tname) (0,False) ONE
   if res 
   then return True
   else do
@@ -179,7 +179,7 @@ getLock tname = do
 
 releaseLock :: TableName -> Cas ()
 releaseLock tname = do 
-  res <- executeTrans (mkLockUpdate tname) (0,True) SERIAL
+  res <- executeTrans (mkLockUpdate tname) (0,True) ONE
   return ()
 
 
