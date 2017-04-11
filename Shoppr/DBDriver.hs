@@ -92,8 +92,11 @@ mkCreateLockTable tname = query $ pack $ "create table " ++ tname ++ "_LOCK (loc
 mkDropLockTable :: TableName -> Query Schema () ()
 mkDropLockTable tname = query $ pack $ "drop table " ++ tname ++ "_LOCK"
 
-mkLockUpdate :: TableName -> Query Write (Int, Bool) ()
-mkLockUpdate tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?)"
+mkLockInsert :: TableName -> Query Write (Int, Bool) ()
+mkLockInsert tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?)"
+
+mkLockUpdate :: TableName -> Query Write (Bool {-old-}, Int, Bool {-New-}) ()
+mkLockUpdate tname = query $ pack $ "update " ++ tname ++ "_LOCK set free = ? where lock = ? if free = ?"
 
 mkLockRead :: TableName -> Query Rows (Int) Bool
 mkLockRead tname = query $ pack $ "select free from " ++ tname ++ "_LOCK where lock = ?"
@@ -149,7 +152,7 @@ initLock :: TableName -> Cas ()
 initLock tname = do 
   liftIO . print =<< executeSchema ALL (mkCreateLockTable tname) ()
   liftIO $ threadDelay  1000000
-  executeWrite ALL (mkLockUpdate tname) (0,True) 
+  executeWrite ALL (mkLockInsert tname) (0,True) 
   return ()
 
 dropLockTable :: TableName -> Cas () 
@@ -159,15 +162,12 @@ dropLockTable tname = do
 
 tryGetLock :: TableName -> Cas Bool
 tryGetLock tname = do 
-  [res] <- executeRows ALL (mkLockRead tname) 0
+  res <- executeTrans (mkLockUpdate tname) (True,0,False) ALL
   if res 
-  then do 
-    executeTrans (mkLockUpdate tname) (0,False) ALL
-    return True
+  then return True
   else do 
-    liftIO $ threadDelay  $ cLOCK_DELAY+10000 	
-    liftIO $ print "Trying to get the lock.."
-    tryGetLock tname
+     liftIO $ threadDelay  $ cLOCK_DELAY
+     tryGetLock tname
 
 
 getLock :: TableName -> Cas ()
@@ -178,8 +178,11 @@ getLock tname = do
 
 releaseLock :: TableName -> Cas ()
 releaseLock tname = do 
-  res <- executeTrans  (mkLockUpdate tname) (0,True) ALL
-  return ()
+  res <- executeTrans (mkLockUpdate tname) (False,0,True) ALL
+  if res 
+  then return ()
+  else error $ "unexpected state: cannot release the lock"
+
 
 
 
