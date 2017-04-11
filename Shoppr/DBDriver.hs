@@ -165,7 +165,7 @@ tryGetLock tname = do
     executeWrite ALL (mkLockUpdate tname) (0,False)
     return True
   else do 
-    liftIO $ threadDelay  $ cLOCK_DELAY+1000 	
+    liftIO $ threadDelay  $ cLOCK_DELAY+10000 	
     liftIO $ print "Trying to get the lock.."
     tryGetLock tname
 
