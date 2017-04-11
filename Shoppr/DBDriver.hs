@@ -148,7 +148,7 @@ dropSessID tname sid = do
 initLock :: TableName -> Cas Bool 
 initLock tname = do 
   liftIO . print =<< executeSchema ALL (mkCreateLockTable tname) ()
-  res <- executeTrans (mkLockUpdate tname) (0,True) ALL
+ -- res <- executeTrans (mkLockUpdate tname) (0,True) ALL
   if res
   then return True
   else error $ "initialization falied"
