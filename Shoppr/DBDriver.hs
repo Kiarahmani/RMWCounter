@@ -148,7 +148,7 @@ dropSessID tname sid = do
 initLock :: TableName -> Cas ()
 initLock tname = do 
   liftIO . print =<< executeSchema ALL (mkCreateLockTable tname) ()
-  executeWrite TWO (mkLockUpdate tname) (0,True) 
+  executeWrite ALL (mkLockUpdate tname) (0,True) 
   return ()
 
 dropLockTable :: TableName -> Cas () 
