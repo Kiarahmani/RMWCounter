@@ -95,7 +95,7 @@ mkDropLockTable tname = query $ pack $ "drop table " ++ tname ++ "_LOCK"
 mkLockInsert :: TableName -> Query Write (Int, Bool) ()
 mkLockInsert tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?)"
 
-mkLockUpdate :: TableName -> Query Writr (Bool {-new-}, Int, Bool {-old-}) ()
+mkLockUpdate :: TableName -> Query Write (Bool {-new-}, Int, Bool {-old-}) ()
 mkLockUpdate tname = query $ pack $ "update " ++ tname ++ "_LOCK set free = ? where lock = ? if free = ?"
 
 mkLockRead :: TableName -> Query Rows (Int) Bool
