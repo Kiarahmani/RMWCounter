@@ -159,14 +159,9 @@ dropLockTable tname = do
   liftIO . print =<< executeSchema ALL (mkDropLockTable tname) ()
 
 
-tryGetLock :: TableName -> Cas Bool 
+tryGetLock :: TableName -> Cas ()
 tryGetLock tname = do 
-  res <- executeWrite ALL (mkLockUpdate tname) (0,False)
-  if res 
-  then return True
-  else do
-      liftIO $ threadDelay cLOCK_DELAY
-      tryGetLock tname 
+  executeWrite ALL (mkLockUpdate tname) (0,False)
 
 
 getLock :: TableName -> Cas ()
