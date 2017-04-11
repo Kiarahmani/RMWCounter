@@ -86,7 +86,7 @@ mkRead tname sid = query $ pack $ "select val, "++(show sid)++" from " ++ tname 
 -- The Alteration Lock
 --------------------------------------------------------------------------------
 mkCreateLockTable :: TableName -> Query Schema () ()
-mkCreateLockTable tname = query $ pack $ "create table " ++ tname ++ "_LOCK (lock int, free bool primary key (lock))"
+mkCreateLockTable tname = query $ pack $ "create table " ++ tname ++ "_LOCK (lock int, free bool, primary key (lock))"
 
 mkDropLockTable :: TableName -> Query Schema () ()
 mkDropLockTable tname = query $ pack $ "drop table " ++ tname ++ "_LOCK"
