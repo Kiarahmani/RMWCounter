@@ -161,14 +161,14 @@ tryGetLock :: TableName -> Cas Bool
 tryGetLock tname = do 
   [res] <- executeRows ALL (mkLockRead tname) 0
   return True 
-  {-if res 
+  if True --res 
   then do 
     executeWrite ALL (mkLockUpdate tname) (0,False)
     return True
   else do 
     liftIO $ threadDelay  cLOCK_DELAY 	
     tryGetLock tname
--}
+
 
 getLock :: TableName -> Cas ()
 getLock tname = do 
