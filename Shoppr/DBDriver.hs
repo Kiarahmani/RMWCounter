@@ -142,7 +142,7 @@ addSessID tname sid  = do
 dropSessID :: TableName -> SessID -> Cas ()
 dropSessID tname sid = do
   liftIO $ putStrLn $ "Dropping Session "++(show sid)
-  liftIO $ threadDelay  1000000  
+  liftIO $ threadDelay  100000  
   liftIO . print =<< executeSchema ONE (mkDropSessID tname sid) ()
 
 
