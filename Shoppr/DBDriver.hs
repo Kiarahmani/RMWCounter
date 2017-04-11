@@ -92,7 +92,7 @@ mkDropLockTable :: TableName -> Query Schema () ()
 mkDropLockTable tname = query $ pack $ "drop table " ++ tname ++ "_LOCK"
 
 mkLockUpdate :: TableName -> Query Write (Int, Bool) ()
-mkLockUpdate tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?) if not exists"
+mkLockUpdate tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?) "
 
 
 
@@ -153,6 +153,11 @@ initLock tname = do
   else error $ "initialization falied"
 
 
+dropLockTable :: TableName -> Cas () 
+dropLockTable tname = do 
+  liftIO . print =<< executeSchema ALL (mkDropLockTable tname) ()
+
+
 tryGetLock :: TableName -> Cas Bool 
 tryGetLock tname = do 
   res <- executeTrans (mkLockUpdate tname) (0,False) ALL
@@ -167,6 +172,8 @@ getLock :: TableName -> Cas ()
 getLock tname = do 
   tryGetLock tname 
   return ()
+
+
 
 
 releaseLock :: TableName -> Cas ()
