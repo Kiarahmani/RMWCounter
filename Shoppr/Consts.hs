@@ -34,3 +34,4 @@ cCACHE_MAX_OBJS = 1024
 
 cTABLE_NAME :: String
 cTABLE_NAME = "counter"
+

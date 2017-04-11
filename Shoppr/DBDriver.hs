@@ -46,7 +46,7 @@ import Control.Monad (when)
 type TableName = String
 
 type ReadRow = (Int {- val -}, SeqNo {- sqn -})
-
+type Lock = Bool
 
 
 --------------------------------------------------------------------------------
@@ -72,14 +72,24 @@ mkInsertInSSN :: TableName -> SessID -> Query Write (Key, Int, SeqNo) ()
 mkInsertInSSN tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, val, "++(show sid)++") values (?, ?, ?) "
 
 
-mkInsertToken :: TableName -> SessID -> Query Write (Key, Int, SeqNo) ()
-mkInsertToken tname sid = query $ pack $ "insert into " ++ tname ++ " (objid, val, "++(show sid)++") values (?, ?, ?) if not exists" 
-
 mkDelete :: TableName -> Query Write (Key) ()
 mkDelete tname = query $ pack $ "delete from " ++ tname ++ " where objid = ?"
 
 mkRead :: TableName -> SessID -> Query Rows (Key) ReadRow
 mkRead tname sid = query $ pack $ "select val, "++(show sid)++" from " ++ tname ++ " where objid = ?"
+
+
+--------------------------------------------------------------------------------
+-- The Alteration Lock
+--------------------------------------------------------------------------------
+mkCreateLockTable :: TableName -> Query Schema () ()
+mkCreateLockTable tname = query $ pack $ "create table " ++ tname ++ "_LOCK (lock int, free bool primary key (lock))"
+
+mkDropLockTable :: TableName -> Query Schema () ()
+mkDropLockTable tname = query $ pack $ "drop table " ++ tname ++ "_LOCK"
+
+mkLockUpdate :: TableName -> Query Write (Int, Bool) ()
+mkLockUpdate tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?) if not exists"
 
 
 
@@ -129,6 +139,43 @@ dropSessID tname sid = do
 
 
 ----------------------------------------------------------------------------------
+
+initLock :: TableName -> Cas Bool 
+initLock tname = do 
+  res <- executeTrans (mkLockUpdate tname) (0,True) ALL
+  if res
+  then return True
+  else error $ "initialization falied"
+
+
+tryGetLock :: TableName -> Cas Bool 
+tryGetLock tname = do 
+  res <- executeTrans (mkLockUpdate tname) (0,False) ALL
+  if res 
+  then return True
+  else do
+      liftIO $ threadDelay cLOCK_DELAY
+      tryGetLock tname 
+
+
+getLock :: TableName -> Cas ()
+getLock tname = do 
+  tryGetLock tname 
+  return ()
+
+
+releaseLock :: TableName -> Cas ()
+releaseLock tname = do 
+  res <- executeTrans (mkLockUpdate tname) (0,True) ALL
+  return ()
+
+
+
+
+
+
+
+
 
 
 
