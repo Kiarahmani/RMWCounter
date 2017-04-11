@@ -44,5 +44,6 @@ main =
       putStrLn "Driver : Creating Table"
       pool <- newPool ([head servers]) keyspace Nothing
       runCas pool $ createTable cTABLE_NAME
+      runCas pool $ initLock cTABLE_NAME 
       return ()
 

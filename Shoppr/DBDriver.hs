@@ -16,6 +16,8 @@ module Shoppr.DBDriver (
   cqlInsertInSSN,
   cqlDelete,
 
+  getLock,
+  releaseLock
 ) where
 
 
