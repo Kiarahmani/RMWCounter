@@ -96,7 +96,7 @@ mkLockUpdate :: TableName -> Query Write (Int, Bool) ()
 mkLockUpdate tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?)"
 
 mkLockRead :: TableName -> Query Rows (Int) Bool
-mkLockRead tname = query $ pack $ "select free from" ++ tname ++ "_LOCK where lock = ?"
+mkLockRead tname = query $ pack $ "select free from " ++ tname ++ "_LOCK where lock = ?"
 -------------------------------------------------------------------------------
 cqlRead :: TableName -> SessID -> Consistency -> Key -> Cas [ReadRow]
 cqlRead tname sid c k = do
