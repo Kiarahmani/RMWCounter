@@ -95,7 +95,7 @@ mkDropLockTable tname = query $ pack $ "drop table " ++ tname ++ "_LOCK"
 mkLockInsert :: TableName -> Query Write (Int, Bool) ()
 mkLockInsert tname = query $ pack $ "insert into " ++ tname ++ "_LOCK (lock, free) values (?, ?)"
 
-mkLockUpdate :: TableName -> Query Write (Bool {-old-}, Int, Bool {-New-}) ()
+mkLockUpdate :: TableName -> Query Writr (Bool {-new-}, Int, Bool {-old-}) ()
 mkLockUpdate tname = query $ pack $ "update " ++ tname ++ "_LOCK set free = ? where lock = ? if free = ?"
 
 mkLockRead :: TableName -> Query Rows (Int) Bool
@@ -162,7 +162,7 @@ dropLockTable tname = do
 
 tryGetLock :: TableName -> Cas Bool
 tryGetLock tname = do 
-  res <- executeTrans (mkLockUpdate tname) (True,0,False) ALL
+  res <- executeTrans (mkLockUpdate tname) (False,0,True) ALL
   if res 
   then return True
   else do 
@@ -179,7 +179,7 @@ getLock tname = do
 
 releaseLock :: TableName -> Cas ()
 releaseLock tname = do 
-  res <- executeTrans (mkLockUpdate tname) (False,0,True) ALL
+  res <- executeTrans (mkLockUpdate tname) (True,0,False) ALL
   if res 
   then return ()
   else error $ "unexpected state: cannot release the lock"
