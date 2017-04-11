@@ -152,7 +152,7 @@ initLock :: TableName -> Cas ()
 initLock tname = do 
   liftIO . print =<< executeSchema ALL (mkCreateLockTable tname) ()
   liftIO $ threadDelay  1000000
-  executeTrans  (mkLockInsert tname) (0,True) ALL
+  executeWrite ALL (mkLockInsert tname) (0,True) 
   return ()
 
 dropLockTable :: TableName -> Cas () 
