@@ -79,7 +79,7 @@ readKey key = do
   let Response _ (Just (val,seqNo')) = decodeResponse responseBlob
   -- liftIO $ putStrLn $ "Is "++(show seqNo')++" >= "++(show seqNo)++"?"
   -- liftIO $ putStrLn $ "read received val = "++(show val)
-  if seqNo' == seqNo - 1
+  if True --seqNo' == seqNo - 1
   then return val
   else do
     liftIO $ threadDelay 100000
