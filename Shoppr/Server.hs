@@ -77,9 +77,9 @@ worker pool = do
 	runCas pool (releaseLock tname)
         return $ Response sqn Nothing
       DropSessID -> do
- --       runCas pool (getLock tname)
+        runCas pool (getLock tname)
 	runCas pool (dropSessID tname sid)
-   --     runCas pool (releaseLock tname) 
+        runCas pool (releaseLock tname) 
 	return $ Response sqn Nothing
     ZMQ4.send sock [] $ encode result
 
