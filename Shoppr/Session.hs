@@ -49,7 +49,7 @@ beginSession i  ns = do
   let req = encode $ Request cTABLE_NAME AddSessID sessid 0
   liftIO $ ZMQ4.send sock [] req
   responseBlob <- liftIO $ ZMQ4.receive sock
-  threadDelay $ 3000000 
+  threadDelay $ 3500000 
   return $ Session (getFrontend ns) sock serverAddr sessid M.empty
 
 endSession :: Session -> IO ()
