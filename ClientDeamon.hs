@@ -61,7 +61,7 @@ main =
       putStrLn "Driver : Starting client"
       replicateM_ threads $ forkIO $ do
           key <- liftIO $ newKey
-	  avgLatency <- runSession ns $ foldM (clientCore  key someTime) 0 [1 .. rounds]
+	  avgLatency <- runSession rounds ns $ foldM (clientCore  key someTime) 0 [1 .. rounds]
           putMVar mv avgLatency
       totalLat <- foldM (\l _ -> takeMVar mv >>= \newL -> return $ l + newL) 0 [1..threads]
       t2 <- getCurrentTime  

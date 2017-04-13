@@ -42,14 +42,14 @@ makeLenses ''Session
 
 type CSN a = StateT Session{-metadata-} IO{-client computations-} a{-type of the result -}
 
-beginSession :: NameService -> IO Session
-beginSession ns = do
+beginSession :: Int -> NameService -> IO Session
+beginSession i  ns = do
   (serverAddr, sock) <- getClientJoin ns
   sessid <- SessID <$> randomIO
   let req = encode $ Request cTABLE_NAME AddSessID sessid 0
   liftIO $ ZMQ4.send sock [] req
   responseBlob <- liftIO $ ZMQ4.receive sock
-  threadDelay 1300000
+  threadDelay $ 40000 * i
   return $ Session (getFrontend ns) sock serverAddr sessid M.empty
 
 endSession :: Session -> IO ()
@@ -60,9 +60,9 @@ endSession s = do
   responseBlob <- liftIO $ ZMQ4.receive (s^.server)
   ZMQ4.disconnect (s ^. server) (s^.serverAddr)
 
-runSession :: Show a =>  NameService -> CSN a -> IO a
-runSession  ns comp = do
-  session <- beginSession  ns 
+runSession :: Show a => Int ->  NameService -> CSN a -> IO a
+runSession i ns comp = do
+  session <- beginSession i ns 
   res <- evalStateT comp session
   endSession session
   return res
